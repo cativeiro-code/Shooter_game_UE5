@@ -15,7 +15,29 @@ AShooterCharacter::AShooterCharacter()
 void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Warning, TEXT("begin play called"));
+
+	int myInt{ 42 };
 	
+	UE_LOG(LogTemp, Warning, TEXT("int myInt = %d"),myInt);
+
+	float myFloat{ 3.14f };
+	UE_LOG(LogTemp, Warning, TEXT("float myfloat= %f"), myFloat);
+
+	double myDouble{ 0.00000756 };
+	UE_LOG(LogTemp, Warning, TEXT("float mydouble= %lf"), myDouble);
+
+	//char myChar{ 'y' };
+	//UE_LOG(LogTemp, Warning, TEXT(" %c"), myChar);
+
+
+
+
+	bool myBool{ true };
+	UE_LOG(LogTemp, Warning, TEXT("mybool= %d"), myBool);
+
+	UE_LOG(LogTemp, Warning, TEXT("int = %d,float=%f,bool=%d"), myInt,myFloat,myBool);
 }
 
 // Called every frame

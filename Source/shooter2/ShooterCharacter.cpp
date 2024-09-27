@@ -2,13 +2,25 @@
 
 
 #include "ShooterCharacter.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 
 // Sets default values
 AShooterCharacter::AShooterCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	//create camera boom! pulls in to the character if there is a collision.
+	cameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("cameraBoom"));
+	cameraBoom->SetupAttachment(RootComponent);
+	cameraBoom->TargetArmLength = 300.f;//distance of the character 
+	cameraBoom->bUsePawnControlRotation = true;//rotate the arm based on the controller !
 
+
+	//create a follow camera 
+	followCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("followCamera"));
+	followCamera->SetupAttachment(cameraBoom, USpringArmComponent::SocketName);//add camera to end of boom.
+	followCamera->bUsePawnControlRotation = false; // 
 }
 
 // Called when the game starts or when spawned
@@ -16,28 +28,8 @@ void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("begin play called"));
-
-	int myInt{ 42 };
-	
-	UE_LOG(LogTemp, Warning, TEXT("int myInt = %d"),myInt);
-
-	float myFloat{ 3.14f };
-	UE_LOG(LogTemp, Warning, TEXT("float myfloat= %f"), myFloat);
-
-	double myDouble{ 0.00000756 };
-	UE_LOG(LogTemp, Warning, TEXT("float mydouble= %lf"), myDouble);
-
-	//char myChar{ 'y' };
-	//UE_LOG(LogTemp, Warning, TEXT(" %c"), myChar);
 
 
-
-
-	bool myBool{ true };
-	UE_LOG(LogTemp, Warning, TEXT("mybool= %d"), myBool);
-
-	UE_LOG(LogTemp, Warning, TEXT("int = %d,float=%f,bool=%d"), myInt,myFloat,myBool);
 }
 
 // Called every frame

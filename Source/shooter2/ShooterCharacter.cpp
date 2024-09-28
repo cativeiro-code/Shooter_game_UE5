@@ -41,6 +41,10 @@ void AShooterCharacter::BeginPlay()
 		}
 	}
 
+
+
+		
+
 }
 
 void AShooterCharacter::move(const FInputActionValue& Value)
@@ -68,6 +72,18 @@ void AShooterCharacter::move(const FInputActionValue& Value)
 
 }
 
+void AShooterCharacter::look(const FInputActionValue& value)
+{
+	FVector2D lookvector = value.Get<FVector2D>();
+
+	if (Controller!= nullptr)
+	{
+		AddControllerYawInput(lookvector.X);
+		AddControllerPitchInput(lookvector.Y);
+	}
+
+}
+
 // Called every frame
 void AShooterCharacter::Tick(float DeltaTime)
 {
@@ -79,6 +95,22 @@ void AShooterCharacter::Tick(float DeltaTime)
 void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+
+
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+
+	if (EnhancedInputComponent)
+	{
+		EnhancedInputComponent->BindAction(jumpAction,ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(jumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+
+		EnhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &AShooterCharacter::move);
+
+		EnhancedInputComponent->BindAction(lookAction, ETriggerEvent::Triggered, this, &AShooterCharacter::look);
+
+
+	}
 
 }
 

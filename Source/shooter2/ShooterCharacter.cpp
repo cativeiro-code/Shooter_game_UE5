@@ -6,8 +6,11 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h"
+#include "Sound/SoundWave.h"
+#include "Kismet/GameplayStatics.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AShooterCharacter::AShooterCharacter()
@@ -25,6 +28,16 @@ AShooterCharacter::AShooterCharacter()
 	followCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("followCamera"));
 	followCamera->SetupAttachment(cameraBoom, USpringArmComponent::SocketName);//add camera to end of boom.
 	followCamera->bUsePawnControlRotation = false; // 
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw = false;
+	
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate =FRotator(0.f,540.f,0.f) ;
+	GetCharacterMovement()->JumpZVelocity = 650.f;
+	GetCharacterMovement()->AirControl = 0.5f;
+	
 }
 
 // Called when the game starts or when spawned
@@ -84,6 +97,14 @@ void AShooterCharacter::look(const FInputActionValue& value)
 
 }
 
+void AShooterCharacter::shoot(const FInputActionValue& value)
+{
+	if (firesound)
+	{
+		UGameplayStatics::PlaySound2D(this, firesound);
+	}
+}
+
 // Called every frame
 void AShooterCharacter::Tick(float DeltaTime)
 {
@@ -108,6 +129,8 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(moveAction, ETriggerEvent::Triggered, this, &AShooterCharacter::move);
 
 		EnhancedInputComponent->BindAction(lookAction, ETriggerEvent::Triggered, this, &AShooterCharacter::look);
+
+		EnhancedInputComponent->BindAction(shootAction, ETriggerEvent::Started, this, &AShooterCharacter::shoot);
 
 
 	}

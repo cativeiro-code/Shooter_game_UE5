@@ -37,11 +37,17 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* lookAction;
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* shootAction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "combat", meta = (AllowPrivateAccess = "true"))
+	class USoundWave* firesound;
 
 	void move(const FInputActionValue& Value);
 
 	void look(const FInputActionValue& value);
+
+	void shoot(const FInputActionValue& value);
 
 
 public:	

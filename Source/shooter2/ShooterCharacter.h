@@ -55,6 +55,9 @@ protected:
 	UParticleSystem* ImpactParticles;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "combat", meta = (AllowPrivateAccess = "true"))
+	UParticleSystem* BeamParticles;
+
 	void move(const FInputActionValue& Value);
 
 	void look(const FInputActionValue& value);

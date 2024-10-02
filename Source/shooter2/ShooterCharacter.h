@@ -40,8 +40,20 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* shootAction;
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "combat", meta = (AllowPrivateAccess = "true"))
 	class USoundWave* firesound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "combat", meta = (AllowPrivateAccess = "true"))
+	class UParticleSystem* Muzzleflash;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "combat", meta = (AllowPrivateAccess = "true"))
+	class UAnimMontage* HipFireMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "combat", meta = (AllowPrivateAccess = "true"))
+	UParticleSystem* ImpactParticles;
+
 
 	void move(const FInputActionValue& Value);
 

@@ -10,6 +10,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Engine/SkeletalMeshSocket.h"
+#include "DrawDebugHelpers.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -102,6 +104,41 @@ void AShooterCharacter::shoot(const FInputActionValue& value)
 	if (firesound)
 	{
 		UGameplayStatics::PlaySound2D(this, firesound);
+	}
+	const USkeletalMeshSocket* barrelSocket = GetMesh()->GetSocketByName("barrelsocket");
+	if (barrelSocket)
+	{
+		const FTransform sockettransform = barrelSocket->GetSocketTransform(GetMesh());
+
+		if (Muzzleflash)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),Muzzleflash,sockettransform);
+		}
+
+
+		FHitResult FireHit;
+		const FVector Start{ sockettransform.GetLocation() };
+		const FQuat Rotation{ sockettransform.GetRotation() };
+		const FVector RotationAxis{ Rotation.GetAxisX() };
+		const FVector End{ (Start + RotationAxis) * 50'000 };
+
+		GetWorld()->LineTraceSingleByChannel(FireHit, Start, End, ECollisionChannel::ECC_Visibility);
+		if (FireHit.bBlockingHit)
+		{
+			DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
+			DrawDebugPoint(GetWorld(), FireHit.Location, 5.f, FColor::Red, false, 2.f);
+		}
+		if (ImpactParticles)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FireHit.Location);
+		}
+
+	}
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && HipFireMontage)
+	{
+		AnimInstance->Montage_Play(HipFireMontage);
+		AnimInstance->Montage_JumpToSection(FName("primeryfire"));
 	}
 }
 

@@ -116,8 +116,65 @@ void AShooterCharacter::shoot(const FInputActionValue& value)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),Muzzleflash,sockettransform);
 		}
+		//get current size of the viewport
+		FVector2D ViewPortSize;
+		if (GEngine && GEngine->GameViewport)
+		{
+			GEngine->GameViewport->GetViewportSize(ViewPortSize);
+		}
+		//get screen space of the cross hairs 
+		FVector2D CrossHairLocation(ViewPortSize.X / 2.f, ViewPortSize.Y / 2.f);
+		CrossHairLocation.Y -= 50.f;
+		FVector CrossHairWorldPosition;
+		FVector CrossHairWorldDirection;
+		//get world position and direction of crosshairs 
+		bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(UGameplayStatics::GetPlayerController(this, 0),
+			CrossHairLocation,
+			CrossHairWorldPosition,
+			CrossHairWorldDirection);
 
+			if (bScreenToWorld)//verify if deprojection was successfull
+			{
+				FHitResult ScreenTraceHit;
+				const FVector start{ CrossHairWorldPosition };
+				const FVector End{ CrossHairWorldPosition + CrossHairWorldDirection * 50000.f };
 
+				//set beam end point to the end of the line trace .
+				FVector BeamEndPoint{ End };
+				GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, start, End, ECollisionChannel::ECC_Visibility);
+				if (ScreenTraceHit.bBlockingHit)//verify if was a hit 
+				{
+					//beam end point is now trace hit location 
+					BeamEndPoint = ScreenTraceHit.Location;
+
+				}
+				//perform a second trace from the gun barrel 
+				FHitResult weapontracehit;
+				const FVector WeapontraceStart{ sockettransform.GetLocation() };
+				const FVector weaponTraceEnd{ BeamEndPoint };
+				GetWorld()->LineTraceSingleByChannel(weapontracehit,WeapontraceStart,weaponTraceEnd,ECollisionChannel::ECC_Visibility);
+
+				if (weapontracehit.bBlockingHit)
+				{
+					BeamEndPoint = weapontracehit.Location;
+				}
+				//sapwn beam paricles after second trace from barrel 
+				if (ImpactParticles)
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, BeamEndPoint);
+				}
+
+				if (BeamParticles)
+				{
+					UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, sockettransform);
+					if (Beam)
+					{
+						Beam->SetVectorParameter(FName("Target"), BeamEndPoint);
+					}
+				}
+			}
+
+		/*
 		FHitResult FireHit;
 		const FVector Start{ sockettransform.GetLocation() };
 		const FQuat Rotation{ sockettransform.GetRotation() };
@@ -146,7 +203,7 @@ void AShooterCharacter::shoot(const FInputActionValue& value)
 			{
 				Beam->SetVectorParameter(FName("Target"), BeamEndPoint);
 			}
-		}
+		}*/
 
 	}
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
